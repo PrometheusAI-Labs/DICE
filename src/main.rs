@@ -1,12 +1,7 @@
-use teloxide::prelude::*;
-use log::{info, error};
-use axum::{
-    http::StatusCode,
-    response::Html,
-    routing::get,
-    Router,
-};
+use axum::{http::StatusCode, response::Html, routing::get, Router};
+use log::{error, info};
 use std::net::SocketAddr;
+use teloxide::prelude::*;
 
 mod bot;
 mod game;
@@ -19,6 +14,10 @@ async fn main() {
     // Инициализация логгера
     env_logger::init();
     
+    // Автозагрузка переменных окружения из .env в dev-режиме
+    // Не паникуем, если файла нет (prod окружение)
+    let _ = dotenvy::dotenv();
+
     info!("Запуск Telegram бота для игры в кубики");
 
     // Получение токена бота из переменных окружения

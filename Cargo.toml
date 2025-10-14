@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-teloxide = { version = "0.12", features = ["macros", "webhooks"] }
+teloxide = { version = "0.12", default-features = false, features = ["macros", "webhooks", "rustls"] }
 tokio = { version = "1.0", features = ["full"] }
 rand = "0.8"
 serde = { version = "1.0", features = ["derive"] }
@@ -12,3 +12,10 @@ log = "0.4"
 env_logger = "0.10"
 axum = "0.7"
 url = "2.4"
+
+[dev-dependencies]
+proptest = "1"
+pretty_assertions = "1"
+
+[dependencies.dotenvy]
+version = "0.15"

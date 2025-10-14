@@ -1,11 +1,11 @@
+use log::{error, info};
 use teloxide::{
+    dispatching::UpdateHandler,
     prelude::*,
     types::{InlineKeyboardButton, InlineKeyboardMarkup, ParseMode},
     utils::command::BotCommands,
-    dispatching::UpdateHandler,
     RequestError,
 };
-use log::{info, error};
 
 use crate::game::DiceGame;
 use crate::state::{EvenOddChoice, HighLowChoice, GuessOneChoice};

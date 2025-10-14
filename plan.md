@@ -3,17 +3,17 @@
 Краткий, практичный план по внедрению тестов, CI/CD, контейнеризации, наблюдаемости и улучшений функционала. Выполняем по фазам, каждая фаза даёт самодостаточную ценность.
 
 ### Фаза 1 — Базовое качество (тесты, стиль, лицензия)
-- [ ] Тесты ядра игры (`src/game.rs`):
-  - [ ] Unit-тесты для `check_even_odd`, `check_high_low`, `check_exact_number`, `check_guess_one`, `dice_emoji`
-  - [ ] Property-тесты (crate `proptest`) для диапазона 1..=6 и свойств чётности/диапазонов
+- [x] Тесты ядра игры (`src/game.rs`):
+  - [x] Unit-тесты для `check_even_odd`, `check_high_low`, `check_exact_number`, `check_guess_one`, `dice_emoji`
+  - [x] Property-тесты (crate `proptest`) для диапазона 1..=6 и свойств чётности/диапазонов
   - [ ] Интеграционные тесты (`tests/`): сценарии `/start`, `/help`, `/play` и callback’и c моком Telegram API
-- [ ] Лицензия: добавить файл `LICENSE` (MIT), чтобы совпадал с README
-- [ ] Единый стиль и инструменты разработчика:
-  - [ ] `rustfmt.toml` (форматирование) и `.editorconfig`
-  - [ ] Предкоммит-хуки (например, `pre-commit`) с `cargo fmt`, `cargo clippy`, `cargo test`
-- [ ] Конфигурация окружения:
-  - [ ] Добавить `dotenvy` и автозагрузка `.env` в dev-режиме
-  - [ ] Шаблон `.env.example` (переменные: `BOT_TOKEN`, `PORT=5000`, `MODE=polling|webhook`)
+- [x] Лицензия: добавить файл `LICENSE` (MIT), чтобы совпадал с README
+- [x] Единый стиль и инструменты разработчика:
+  - [x] `rustfmt.toml` (форматирование) и `.editorconfig`
+  - [x] Предкоммит-хуки (например, `pre-commit`) с `cargo fmt`, `cargo clippy`, `cargo test`
+- [x] Конфигурация окружения:
+  - [x] Добавить `dotenvy` и автозагрузка `.env` в dev-режиме
+  - [x] Шаблон `.env.example` (переменные: `BOT_TOKEN`, `PORT=5000`, `MODE=polling|webhook`)
 
 Примеры команд:
 
@@ -24,18 +24,18 @@ cargo fmt && cargo clippy -D warnings && cargo test
 ```
 
 ### Фаза 2 — CI/CD
-- [ ] GitHub Actions: `.github/workflows/ci.yml`
-  - [ ] Установка toolchain, кеш Cargo
-  - [ ] Шаги: `fmt --check`, `clippy -D warnings`, `test --all`
+- [x] GitHub Actions: `.github/workflows/ci.yml`
+  - [x] Установка toolchain, кеш Cargo
+  - [x] Шаги: `fmt --check`, `clippy -D warnings`, `test --all`
   - [ ] Безопасность: `cargo-audit`, `cargo-deny`
 - [ ] Автообновления: `dependabot.yml` (Cargo + GitHub Actions)
 - [ ] Релизы (опционально): `cargo-release` и публикация GitHub Releases по тегу
 
 ### Фаза 3 — Контейнеризация и поставка
-- [ ] `Dockerfile` (multi-stage):
-  - [ ] Сборка релизного бинаря
-  - [ ] Runtime-образ минимальный, запуск под non-root
-  - [ ] По возможности `rustls` вместо OpenSSL для упрощения доставки
+- [x] `Dockerfile` (multi-stage):
+  - [x] Сборка релизного бинаря
+  - [x] Runtime-образ минимальный, запуск под non-root
+  - [x] По возможности `rustls` вместо OpenSSL для упрощения доставки
 - [ ] `docker-compose.yml` для локального запуска
 - [ ] Публикация образа в GHCR из CI (по тегу/мэйнам)
 
@@ -82,6 +82,6 @@ docker run --rm -e BOT_TOKEN=... -e PORT=5000 -p 5000:5000 ghcr.io/<org>/telegra
 - [ ] Документация обновлена: README разделы по запуску (локально/Docker), переменные окружения
 
 ### Следующие шаги (я могу сделать сразу)
-- [ ] Добавить unit-тесты для `src/game.rs`
-- [ ] Создать `.github/workflows/ci.yml` (fmt, clippy, test)
-- [ ] Добавить `Dockerfile` и `.env.example`
+- [x] Добавить unit-тесты для `src/game.rs`
+- [x] Создать `.github/workflows/ci.yml` (fmt, clippy, test)
+- [x] Добавить `Dockerfile` и `.env.example`
