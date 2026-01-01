@@ -5,12 +5,6 @@ use rand::Rng;
 pub struct DiceGame;
 
 impl DiceGame {
-    /// Бросок кубика - возвращает число от 1 до 6
-    pub fn roll_dice() -> u8 {
-        let mut rng = rand::thread_rng();
-        rng.gen_range(1..=6)
-    }
-
     /// Проверка результата для игры "Четное/Нечетное"
     pub fn check_even_odd(dice_result: u8, user_choice: EvenOddChoice) -> bool {
         let is_even = dice_result % 2 == 0;
@@ -39,19 +33,6 @@ impl DiceGame {
         match user_choice {
             GuessOneChoice::Yes => is_one,
             GuessOneChoice::No => !is_one,
-        }
-    }
-
-    /// Получение эмодзи кубика по числу
-    pub fn dice_emoji(number: u8) -> &'static str {
-        match number {
-            1 => "⚀",
-            2 => "⚁",
-            3 => "⚂",
-            4 => "⚃",
-            5 => "⚄",
-            6 => "⚅",
-            _ => "🎲",
         }
     }
 
@@ -93,34 +74,6 @@ impl DiceGame {
             "🤝 Ничья!"
         }
     }
-
-    /// Сообщение о победителе в сравнении бросков
-    pub fn dice_battle_win_message(_winner: &str) -> &'static str {
-        let messages = [
-            "🏆 Невероятная победа!",
-            "🎊 Блестящая игра!",
-            "✨ Суперский результат!",
-            "🌟 Высокий уровень мастерства!",
-            "🎯 Превосходная тактика!",
-        ];
-        let mut rng = rand::thread_rng();
-        let index = rng.gen_range(0..messages.len());
-        messages[index]
-    }
-
-    /// Сообщение о ничьей в сравнении бросков
-    pub fn dice_battle_tie_message() -> &'static str {
-        let messages = [
-            "🤝 Ничья! Равные силы!",
-            "⚖️ Баланс сохранился!",
-            "🎭 Парадокс силы!",
-            "🔄 Интрига решается...",
-            "⚡ Искры сошлись!",
-        ];
-        let mut rng = rand::thread_rng();
-        let index = rng.gen_range(0..messages.len());
-        messages[index]
-    }
 }
 
 #[cfg(test)]
@@ -159,26 +112,6 @@ mod tests {
         assert!(!DiceGame::check_guess_one(1, GuessOneChoice::No));
         assert!(DiceGame::check_guess_one(3, GuessOneChoice::No));
         assert!(!DiceGame::check_guess_one(3, GuessOneChoice::Yes));
-    }
-
-    #[test]
-    fn test_dice_emoji_mapping() {
-        assert_eq!(DiceGame::dice_emoji(1), "⚀");
-        assert_eq!(DiceGame::dice_emoji(2), "⚁");
-        assert_eq!(DiceGame::dice_emoji(3), "⚂");
-        assert_eq!(DiceGame::dice_emoji(4), "⚃");
-        assert_eq!(DiceGame::dice_emoji(5), "⚄");
-        assert_eq!(DiceGame::dice_emoji(6), "⚅");
-        assert_eq!(DiceGame::dice_emoji(0), "🎲");
-        assert_eq!(DiceGame::dice_emoji(7), "🎲");
-    }
-
-    #[test]
-    fn test_roll_dice_range() {
-        for _ in 0..1000 {
-            let value = DiceGame::roll_dice();
-            assert!((1..=6).contains(&value), "roll_dice produced {}", value);
-        }
     }
 
     #[test]
