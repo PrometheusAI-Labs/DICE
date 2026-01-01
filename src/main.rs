@@ -13,7 +13,7 @@ use bot::BotHandler;
 async fn main() {
     // Инициализация логгера
     env_logger::init();
-    
+
     // Автозагрузка переменных окружения из .env в dev-режиме
     // Не паникуем, если файла нет (prod окружение)
     let _ = dotenvy::dotenv();
@@ -26,16 +26,16 @@ async fn main() {
 
     info!("Подключение к Telegram API...");
     let bot = Bot::new(bot_token);
-    
+
     // Создание обработчика бота
     let handler = BotHandler::new();
-    
+
     // Получение порта из переменных окружения (по умолчанию 5000)
     let port = std::env::var("PORT")
         .unwrap_or_else(|_| "5000".to_string())
         .parse::<u16>()
         .expect("PORT должен быть валидным номером порта");
-    
+
     let addr = SocketAddr::from(([0, 0, 0, 0], port));
     info!("HTTP сервер запускается на порту {}", port);
 
@@ -64,7 +64,6 @@ async fn main() {
         info!("Запуск Telegram бота...");
         Dispatcher::builder(bot, handler.schema())
             .dependencies(dptree::deps![])
-            .enable_ctrlc_handler()
             .build()
             .dispatch()
             .await;
@@ -73,7 +72,10 @@ async fn main() {
 
     // Даем время серверу запуститься
     tokio::time::sleep(tokio::time::Duration::from_secs(2)).await;
-    info!("Приложение запущено. HTTP сервер работает на порту {}", port);
+    info!(
+        "Приложение запущено. HTTP сервер работает на порту {}",
+        port
+    );
 
     // Ожидание завершения любой из задач
     tokio::select! {
@@ -94,5 +96,7 @@ async fn main() {
 
 // Health check endpoint для Autoscale deployment
 async fn health_check() -> Result<Html<&'static str>, StatusCode> {
-    Ok(Html("<h1>Telegram Dice Bot is running</h1><p>Status: OK</p>"))
+    Ok(Html(
+        "<h1>Telegram Dice Bot is running</h1><p>Status: OK</p>",
+    ))
 }

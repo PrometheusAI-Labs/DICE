@@ -1,4 +1,4 @@
-use crate::state::{EvenOddChoice, HighLowChoice, GuessOneChoice};
+use crate::state::{EvenOddChoice, GuessOneChoice, HighLowChoice};
 use rand::Rng;
 
 /// Структура для управления игровой логикой
@@ -87,7 +87,7 @@ impl DiceGame {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::state::{EvenOddChoice, HighLowChoice, GuessOneChoice};
+    use crate::state::{EvenOddChoice, GuessOneChoice, HighLowChoice};
     use pretty_assertions::assert_eq;
 
     #[test]

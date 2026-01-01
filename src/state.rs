@@ -26,29 +26,29 @@ impl Default for DialogueState {
 /// Типы игр
 #[derive(Clone, Debug, PartialEq)]
 pub enum GameType {
-    EvenOdd,    // Четное/Нечетное
-    HighLow,    // Больше/Меньше 3.5
+    EvenOdd,     // Четное/Нечетное
+    HighLow,     // Больше/Меньше 3.5
     ExactNumber, // Точное число
-    GuessOne,   // Угадать единицу
+    GuessOne,    // Угадать единицу
 }
 
 /// Выбор пользователя в игре "Четное/Нечетное"
 #[derive(Clone, Debug, PartialEq)]
 pub enum EvenOddChoice {
-    Even,  // Четное
-    Odd,   // Нечетное
+    Even, // Четное
+    Odd,  // Нечетное
 }
 
 /// Выбор пользователя в игре "Больше/Меньше 3.5"
 #[derive(Clone, Debug, PartialEq)]
 pub enum HighLowChoice {
-    High,  // Больше 3.5 (4-6)
-    Low,   // Меньше 3.5 (1-3)
+    High, // Больше 3.5 (4-6)
+    Low,  // Меньше 3.5 (1-3)
 }
 
 /// Выбор пользователя в игре "Угадать единицу"
 #[derive(Clone, Debug, PartialEq)]
 pub enum GuessOneChoice {
-    Yes,   // Выпадет единица
-    No,    // Не выпадет единица
+    Yes, // Выпадет единица
+    No,  // Не выпадет единица
 }

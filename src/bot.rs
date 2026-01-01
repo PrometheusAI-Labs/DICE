@@ -8,7 +8,7 @@ use teloxide::{
 };
 
 use crate::game::DiceGame;
-use crate::state::{EvenOddChoice, HighLowChoice, GuessOneChoice};
+use crate::state::{EvenOddChoice, GuessOneChoice, HighLowChoice};
 
 /// Команды бота
 #[derive(BotCommands, Clone)]
@@ -38,8 +38,7 @@ impl BotHandler {
             .branch(case![Command::Help].endpoint(Self::help_command))
             .branch(case![Command::Play].endpoint(Self::play_command));
 
-        let callback_handler = Update::filter_callback_query()
-            .endpoint(Self::handle_callback);
+        let callback_handler = Update::filter_callback_query().endpoint(Self::handle_callback);
 
         let message_handler = Update::filter_message()
             .branch(command_handler)
@@ -53,7 +52,7 @@ impl BotHandler {
     /// Обработчик команды /start
     async fn start_command(bot: Bot, msg: Message) -> ResponseResult<()> {
         info!("Пользователь {} начал работу с ботом", msg.chat.id);
-        
+
         let text = "🎲 Привет! Добро пожаловать в игру с кубиками!\n\n\
                    Я предлагаю вам угадать результат броска кубика.\n\
                    Доступны четыре варианта игры:\n\n\
@@ -66,7 +65,7 @@ impl BotHandler {
         bot.send_message(msg.chat.id, text)
             .parse_mode(ParseMode::Html)
             .await?;
-        
+
         Ok(())
     }
 
@@ -90,7 +89,7 @@ impl BotHandler {
         bot.send_message(msg.chat.id, text)
             .parse_mode(ParseMode::Html)
             .await?;
-        
+
         Ok(())
     }
 
@@ -103,10 +102,22 @@ impl BotHandler {
     /// Отображение выбора типа игры
     async fn show_game_selection(bot: &Bot, chat_id: ChatId) -> ResponseResult<()> {
         let keyboard = InlineKeyboardMarkup::new(vec![
-            vec![InlineKeyboardButton::callback("🔵 Четное/Нечетное", "game_even_odd")],
-            vec![InlineKeyboardButton::callback("🔴 Больше/Меньше 3.5", "game_high_low")],
-            vec![InlineKeyboardButton::callback("🎯 Точное число", "game_exact")],
-            vec![InlineKeyboardButton::callback("⚀ Угадать единицу", "game_guess_one")],
+            vec![InlineKeyboardButton::callback(
+                "🔵 Четное/Нечетное",
+                "game_even_odd",
+            )],
+            vec![InlineKeyboardButton::callback(
+                "🔴 Больше/Меньше 3.5",
+                "game_high_low",
+            )],
+            vec![InlineKeyboardButton::callback(
+                "🎯 Точное число",
+                "game_exact",
+            )],
+            vec![InlineKeyboardButton::callback(
+                "⚀ Угадать единицу",
+                "game_guess_one",
+            )],
         ]);
 
         let text = "🎲 Выберите вариант игры:";
@@ -114,7 +125,7 @@ impl BotHandler {
         bot.send_message(chat_id, text)
             .reply_markup(keyboard)
             .await?;
-        
+
         Ok(())
     }
 
@@ -123,7 +134,7 @@ impl BotHandler {
         if let Some(data) = &callback.data {
             if let Some(message) = &callback.message {
                 let chat_id = message.chat.id;
-                
+
                 match data.as_str() {
                     "game_even_odd" => {
                         Self::start_even_odd_game(&bot, chat_id).await?;
@@ -176,12 +187,10 @@ impl BotHandler {
 
     /// Начало игры "Четное/Нечетное"
     async fn start_even_odd_game(bot: &Bot, chat_id: ChatId) -> ResponseResult<()> {
-        let keyboard = InlineKeyboardMarkup::new(vec![
-            vec![
-                InlineKeyboardButton::callback("🔵 Четное", "choice_even"),
-                InlineKeyboardButton::callback("🔴 Нечетное", "choice_odd"),
-            ],
-        ]);
+        let keyboard = InlineKeyboardMarkup::new(vec![vec![
+            InlineKeyboardButton::callback("🔵 Четное", "choice_even"),
+            InlineKeyboardButton::callback("🔴 Нечетное", "choice_odd"),
+        ]]);
 
         let text = "🔵 <b>Игра: Четное/Нечетное</b>\n\n\
                    Выберите, будет ли результат броска четным или нечетным числом:";
@@ -190,18 +199,16 @@ impl BotHandler {
             .parse_mode(ParseMode::Html)
             .reply_markup(keyboard)
             .await?;
-        
+
         Ok(())
     }
 
     /// Начало игры "Больше/Меньше 3.5"
     async fn start_high_low_game(bot: &Bot, chat_id: ChatId) -> ResponseResult<()> {
-        let keyboard = InlineKeyboardMarkup::new(vec![
-            vec![
-                InlineKeyboardButton::callback("⬆️ Больше 3.5 (4-6)", "choice_high"),
-                InlineKeyboardButton::callback("⬇️ Меньше 3.5 (1-3)", "choice_low"),
-            ],
-        ]);
+        let keyboard = InlineKeyboardMarkup::new(vec![vec![
+            InlineKeyboardButton::callback("⬆️ Больше 3.5 (4-6)", "choice_high"),
+            InlineKeyboardButton::callback("⬇️ Меньше 3.5 (1-3)", "choice_low"),
+        ]]);
 
         let text = "🔴 <b>Игра: Больше/Меньше 3.5</b>\n\n\
                    Выберите, будет ли результат больше или меньше 3.5:";
@@ -210,7 +217,7 @@ impl BotHandler {
             .parse_mode(ParseMode::Html)
             .reply_markup(keyboard)
             .await?;
-        
+
         Ok(())
     }
 
@@ -236,18 +243,16 @@ impl BotHandler {
             .parse_mode(ParseMode::Html)
             .reply_markup(keyboard)
             .await?;
-        
+
         Ok(())
     }
 
     /// Начало игры "Угадать единицу"
     async fn start_guess_one_game(bot: &Bot, chat_id: ChatId) -> ResponseResult<()> {
-        let keyboard = InlineKeyboardMarkup::new(vec![
-            vec![
-                InlineKeyboardButton::callback("✅ Да, выпадет единица", "guess_one_yes"),
-                InlineKeyboardButton::callback("❌ Нет, не выпадет", "guess_one_no"),
-            ],
-        ]);
+        let keyboard = InlineKeyboardMarkup::new(vec![vec![
+            InlineKeyboardButton::callback("✅ Да, выпадет единица", "guess_one_yes"),
+            InlineKeyboardButton::callback("❌ Нет, не выпадет", "guess_one_no"),
+        ]]);
 
         let text = "⚀ <b>Игра: Угадать единицу</b>\n\n\
                    Выпадет ли на кубике единица?";
@@ -256,33 +261,44 @@ impl BotHandler {
             .parse_mode(ParseMode::Html)
             .reply_markup(keyboard)
             .await?;
-        
+
         Ok(())
     }
 
     /// Игра "Четное/Нечетное"
-    async fn play_even_odd_game(bot: &Bot, chat_id: ChatId, choice: EvenOddChoice) -> ResponseResult<()> {
+    async fn play_even_odd_game(
+        bot: &Bot,
+        chat_id: ChatId,
+        choice: EvenOddChoice,
+    ) -> ResponseResult<()> {
         let choice_text = match choice {
             EvenOddChoice::Even => "четное",
             EvenOddChoice::Odd => "нечетное",
         };
 
         // Отправляем сообщение о выборе пользователя
-        bot.send_message(chat_id, format!("🎯 Вы выбрали: {}\n🎲 Бросаю кубик...", choice_text))
-            .await?;
+        bot.send_message(
+            chat_id,
+            format!("🎯 Вы выбрали: {}\n🎲 Бросаю кубик...", choice_text),
+        )
+        .await?;
 
         // Отправляем анимированный кубик
         let dice_message = bot.send_dice(chat_id).await?;
-        
+
         // Получаем результат кубика
         if let Some(dice) = dice_message.dice() {
             let dice_result = dice.value as u8;
             let is_win = DiceGame::check_even_odd(dice_result, choice.clone());
-            let result_text = if dice_result % 2 == 0 { "четное" } else { "нечетное" };
-            
+            let result_text = if dice_result % 2 == 0 {
+                "четное"
+            } else {
+                "нечетное"
+            };
+
             // Даем время для анимации кубика
             tokio::time::sleep(tokio::time::Duration::from_secs(3)).await;
-            
+
             let message = if is_win {
                 format!(
                     "🎉 Число {}: {}\n\n{}",
@@ -301,34 +317,45 @@ impl BotHandler {
 
             bot.send_message(chat_id, message).await?;
         }
-        
+
         // Предложение новой игры
         Self::offer_new_game(bot, chat_id).await
     }
 
     /// Игра "Больше/Меньше 3.5"
-    async fn play_high_low_game(bot: &Bot, chat_id: ChatId, choice: HighLowChoice) -> ResponseResult<()> {
+    async fn play_high_low_game(
+        bot: &Bot,
+        chat_id: ChatId,
+        choice: HighLowChoice,
+    ) -> ResponseResult<()> {
         let choice_text = match choice {
             HighLowChoice::High => "больше 3.5 (4-6)",
             HighLowChoice::Low => "меньше 3.5 (1-3)",
         };
 
         // Отправляем сообщение о выборе пользователя
-        bot.send_message(chat_id, format!("📊 Вы выбрали: {}\n🎲 Бросаю кубик...", choice_text))
-            .await?;
+        bot.send_message(
+            chat_id,
+            format!("📊 Вы выбрали: {}\n🎲 Бросаю кубик...", choice_text),
+        )
+        .await?;
 
         // Отправляем анимированный кубик
         let dice_message = bot.send_dice(chat_id).await?;
-        
+
         // Получаем результат кубика
         if let Some(dice) = dice_message.dice() {
             let dice_result = dice.value as u8;
             let is_win = DiceGame::check_high_low(dice_result, choice.clone());
-            let result_text = if dice_result >= 4 { "больше 3.5" } else { "меньше 3.5" };
-            
+            let result_text = if dice_result >= 4 {
+                "больше 3.5"
+            } else {
+                "меньше 3.5"
+            };
+
             // Даем время для анимации кубика
             tokio::time::sleep(tokio::time::Duration::from_secs(3)).await;
-            
+
             let message = if is_win {
                 format!(
                     "🎉 Число {} - {}\n\n{}",
@@ -347,7 +374,7 @@ impl BotHandler {
 
             bot.send_message(chat_id, message).await?;
         }
-        
+
         // Предложение новой игры
         Self::offer_new_game(bot, chat_id).await
     }
@@ -355,20 +382,23 @@ impl BotHandler {
     /// Игра "Точное число"
     async fn play_exact_number_game(bot: &Bot, chat_id: ChatId, guess: u8) -> ResponseResult<()> {
         // Отправляем сообщение о выборе пользователя
-        bot.send_message(chat_id, format!("🎯 Вы выбрали число: {}\n🎲 Бросаю кубик...", guess))
-            .await?;
+        bot.send_message(
+            chat_id,
+            format!("🎯 Вы выбрали число: {}\n🎲 Бросаю кубик...", guess),
+        )
+        .await?;
 
         // Отправляем анимированный кубик
         let dice_message = bot.send_dice(chat_id).await?;
-        
+
         // Получаем результат кубика
         if let Some(dice) = dice_message.dice() {
             let dice_result = dice.value as u8;
             let is_win = DiceGame::check_exact_number(dice_result, guess);
-            
+
             // Даем время для анимации кубика
             tokio::time::sleep(tokio::time::Duration::from_secs(3)).await;
-            
+
             let message = if is_win {
                 format!(
                     "🎉 Выпало число: {}\nВы угадали!\n\n{}",
@@ -386,34 +416,45 @@ impl BotHandler {
 
             bot.send_message(chat_id, message).await?;
         }
-        
+
         // Предложение новой игры
         Self::offer_new_game(bot, chat_id).await
     }
 
     /// Игра "Угадать единицу"
-    async fn play_guess_one_game(bot: &Bot, chat_id: ChatId, choice: GuessOneChoice) -> ResponseResult<()> {
+    async fn play_guess_one_game(
+        bot: &Bot,
+        chat_id: ChatId,
+        choice: GuessOneChoice,
+    ) -> ResponseResult<()> {
         let choice_text = match choice {
             GuessOneChoice::Yes => "да, выпадет единица",
             GuessOneChoice::No => "нет, не выпадет единица",
         };
 
         // Отправляем сообщение о выборе пользователя
-        bot.send_message(chat_id, format!("⚀ Вы выбрали: {}\n🎲 Бросаю кубик...", choice_text))
-            .await?;
+        bot.send_message(
+            chat_id,
+            format!("⚀ Вы выбрали: {}\n🎲 Бросаю кубик...", choice_text),
+        )
+        .await?;
 
         // Отправляем анимированный кубик
         let dice_message = bot.send_dice(chat_id).await?;
-        
+
         // Получаем результат кубика
         if let Some(dice) = dice_message.dice() {
             let dice_result = dice.value as u8;
             let is_win = DiceGame::check_guess_one(dice_result, choice.clone());
-            let result_text = if dice_result == 1 { "выпала единица" } else { "единица не выпала" };
-            
+            let result_text = if dice_result == 1 {
+                "выпала единица"
+            } else {
+                "единица не выпала"
+            };
+
             // Даем время для анимации кубика
             tokio::time::sleep(tokio::time::Duration::from_secs(3)).await;
-            
+
             let message = if is_win {
                 format!(
                     "🎉 Число {}: {}\n\n{}",
@@ -432,7 +473,7 @@ impl BotHandler {
 
             bot.send_message(chat_id, message).await?;
         }
-        
+
         // Предложение новой игры
         Self::offer_new_game(bot, chat_id).await
     }
@@ -440,10 +481,10 @@ impl BotHandler {
     /// Предложение новой игры
     async fn offer_new_game(bot: &Bot, chat_id: ChatId) -> ResponseResult<()> {
         tokio::time::sleep(tokio::time::Duration::from_secs(2)).await;
-        
+
         let text = "🎮 Хотите сыграть еще раз? Используйте /play для новой игры!";
         bot.send_message(chat_id, text).await?;
-        
+
         Ok(())
     }
 
@@ -455,8 +496,11 @@ impl BotHandler {
                     Self::show_game_selection(&bot, msg.chat.id).await?;
                 }
                 "привет" | "hello" | "hi" => {
-                    bot.send_message(msg.chat.id, "🎲 Привет! Хотите сыграть в кубики? Используйте /play")
-                        .await?;
+                    bot.send_message(
+                        msg.chat.id,
+                        "🎲 Привет! Хотите сыграть в кубики? Используйте /play",
+                    )
+                    .await?;
                 }
                 _ => {
                     bot.send_message(
@@ -466,7 +510,7 @@ impl BotHandler {
                 }
             }
         }
-        
+
         Ok(())
     }
 }
