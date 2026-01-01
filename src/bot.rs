@@ -115,7 +115,7 @@ impl BotHandler {
                 "game_exact",
             )],
             vec![InlineKeyboardButton::callback(
-                "⚀ Угадать единицу",
+                "🎱 Угадать единицу",
                 "game_guess_one",
             )],
         ]);
