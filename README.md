@@ -132,3 +132,5 @@ MIT License
 Создано с помощью Replit AI
 
 Улучшено с помощью OpenCode GLM-4.7
+
+Разработано Alxy Dev @ 2026
