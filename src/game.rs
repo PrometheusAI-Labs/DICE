@@ -82,6 +82,45 @@ impl DiceGame {
         let index = rng.gen_range(0..messages.len());
         messages[index]
     }
+
+    /// Сравнение результатов бросков кубиков
+    pub fn compare_dices(bot_dice: u8, user_dice: u8) -> &'static str {
+        if bot_dice > user_dice {
+            "🤖 Компьютер победил!"
+        } else if user_dice > bot_dice {
+            "🎉 Пользователь победил!"
+        } else {
+            "🤝 Ничья!"
+        }
+    }
+
+    /// Сообщение о победителе в сравнении бросков
+    pub fn dice_battle_win_message(_winner: &str) -> &'static str {
+        let messages = [
+            "🏆 Невероятная победа!",
+            "🎊 Блестящая игра!",
+            "✨ Суперский результат!",
+            "🌟 Высокий уровень мастерства!",
+            "🎯 Превосходная тактика!",
+        ];
+        let mut rng = rand::thread_rng();
+        let index = rng.gen_range(0..messages.len());
+        messages[index]
+    }
+
+    /// Сообщение о ничьей в сравнении бросков
+    pub fn dice_battle_tie_message() -> &'static str {
+        let messages = [
+            "🤝 Ничья! Равные силы!",
+            "⚖️ Баланс сохранился!",
+            "🎭 Парадокс силы!",
+            "🔄 Интрига решается...",
+            "⚡ Искры сошлись!",
+        ];
+        let mut rng = rand::thread_rng();
+        let index = rng.gen_range(0..messages.len());
+        messages[index]
+    }
 }
 
 #[cfg(test)]
@@ -140,6 +179,21 @@ mod tests {
             let value = DiceGame::roll_dice();
             assert!((1..=6).contains(&value), "roll_dice produced {}", value);
         }
+    }
+
+    #[test]
+    fn test_compare_dices_bot_wins() {
+        assert_eq!(DiceGame::compare_dices(5, 3), "🤖 Компьютер победил!");
+    }
+
+    #[test]
+    fn test_compare_dices_user_wins() {
+        assert_eq!(DiceGame::compare_dices(2, 4), "🎉 Пользователь победил!");
+    }
+
+    #[test]
+    fn test_compare_dices_tie() {
+        assert_eq!(DiceGame::compare_dices(3, 3), "🤝 Ничья!");
     }
 
     mod properties {

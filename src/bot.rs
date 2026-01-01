@@ -40,6 +40,10 @@ impl BotHandler {
 
         let callback_handler = Update::filter_callback_query().endpoint(Self::handle_callback);
 
+        let dice_filter = Update::filter_message()
+            .filter(|msg: &Message| msg.dice().is_some())
+            .branch(dptree::endpoint(Self::handle_dice_message));
+
         let message_handler = Update::filter_message()
             .branch(command_handler)
             .branch(dptree::endpoint(Self::handle_message));
@@ -47,6 +51,7 @@ impl BotHandler {
         dptree::entry()
             .branch(message_handler)
             .branch(callback_handler)
+            .branch(dice_filter)
     }
 
     /// Обработчик команды /start
@@ -488,10 +493,41 @@ impl BotHandler {
         Ok(())
     }
 
+    /// Обработчик сообщений с кубиком
+    async fn handle_dice_message(bot: Bot, msg: Message) -> ResponseResult<()> {
+        info!("Пользователь {} бросил кубик", msg.chat.id);
+
+        let user_dice = msg.dice().unwrap().value as u8;
+
+        bot.send_message(
+            msg.chat.id,
+            format!("🎲 Вы бросили: {}\n🤖 Мой ход...", user_dice),
+        )
+        .await?;
+
+        let bot_dice_msg = bot.send_dice(msg.chat.id).await?;
+        let bot_dice = bot_dice_msg.dice().unwrap().value as u8;
+
+        tokio::time::sleep(tokio::time::Duration::from_secs(3)).await;
+
+        let result = DiceGame::compare_dices(bot_dice, user_dice);
+        let message = format!("🤖 Мой результат: {}\n\n🎯 {}", bot_dice, result);
+        bot.send_message(msg.chat.id, message).await?;
+
+        Ok(())
+    }
+
     /// Обработчик обычных сообщений
     async fn handle_message(bot: Bot, msg: Message) -> ResponseResult<()> {
         if let Some(text) = msg.text() {
             match text.to_lowercase().as_str() {
+                "🎲" => {
+                    bot.send_message(
+                        msg.chat.id,
+                        "🎲 Нажмите на кнопку кубика в Telegram, чтобы бросить!",
+                    )
+                    .await?;
+                }
                 "играть" | "игра" | "кубик" | "кубики" => {
                     Self::show_game_selection(&bot, msg.chat.id).await?;
                 }
