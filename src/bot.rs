@@ -40,18 +40,13 @@ impl BotHandler {
 
         let callback_handler = Update::filter_callback_query().endpoint(Self::handle_callback);
 
-        let dice_filter = Update::filter_message()
-            .filter(|msg: &Message| msg.dice().is_some())
-            .branch(dptree::endpoint(Self::handle_dice_message));
-
         let message_handler = Update::filter_message()
             .branch(command_handler)
             .branch(dptree::endpoint(Self::handle_message));
 
         dptree::entry()
-            .branch(message_handler)
             .branch(callback_handler)
-            .branch(dice_filter)
+            .branch(message_handler)
     }
 
     /// Обработчик команды /start
@@ -498,27 +493,41 @@ impl BotHandler {
         info!("Пользователь {} бросил кубик", msg.chat.id);
 
         let user_dice = msg.dice().unwrap().value as u8;
+        info!("Результат пользователя: {}", user_dice);
 
+        info!("Отправка сообщения о результате пользователя...");
         bot.send_message(
             msg.chat.id,
             format!("🎲 Вы бросили: {}\n🤖 Мой ход...", user_dice),
         )
         .await?;
+        info!("Сообщение о результате пользователя отправлено");
 
+        info!("Отправка кубика бота...");
         let bot_dice_msg = bot.send_dice(msg.chat.id).await?;
         let bot_dice = bot_dice_msg.dice().unwrap().value as u8;
+        info!("Результат бота: {}", bot_dice);
 
+        info!("Ожидание 3 секунды...");
         tokio::time::sleep(tokio::time::Duration::from_secs(3)).await;
 
         let result = DiceGame::compare_dices(bot_dice, user_dice);
+        info!("Результат сравнения: {}", result);
+
+        info!("Отправка финального сообщения...");
         let message = format!("🤖 Мой результат: {}\n\n🎯 {}", bot_dice, result);
         bot.send_message(msg.chat.id, message).await?;
+        info!("Финальное сообщение отправлено");
 
         Ok(())
     }
 
     /// Обработчик обычных сообщений
     async fn handle_message(bot: Bot, msg: Message) -> ResponseResult<()> {
+        if msg.dice().is_some() {
+            return Self::handle_dice_message(bot, msg).await;
+        }
+
         if let Some(text) = msg.text() {
             match text.to_lowercase().as_str() {
                 "🎲" => {
