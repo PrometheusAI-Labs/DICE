@@ -1,0 +1,10 @@
+target/
+.env
+.git/
+.github/
+.vscode/
+.idea/
+*.log
+.DS_Store
+Thumbs.db
+.replit_envtarget
