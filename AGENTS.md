@@ -6,10 +6,28 @@ This file contains guidelines for agentic coding assistants working on the Teleg
 
 ### Build & Run
 ```bash
-cargo build                    # Build the project
-cargo run                      # Run the bot (requires BOT_TOKEN env var)
+cargo build                    # Build project
+cargo run                      # Run bot (requires BOT_TOKEN env var)
 RUST_LOG=debug cargo run       # Run with debug logging
 ```
+
+### Docker Deployment
+```bash
+make build      # Build Docker image
+make run        # Build and start container
+make up         # Start container
+make down       # Stop container
+make logs       # View logs (follow mode)
+make status     # Check container status
+make restart    # Restart container
+make prune      # Clean unused Docker resources
+make clean      # Remove containers and images
+```
+
+### Environment Variables for Docker
+- `BOT_TOKEN`: Telegram bot token (required for bot to work)
+- `PORT`: Health check port (default: 5000)
+- `RUST_LOG`: Log level (info, debug, warn, error)
 
 ### Code Quality
 ```bash
@@ -260,10 +278,21 @@ src/
 └── state.rs     # State enums, types
 ```
 
+Docker/
+├── Dockerfile           # Multi-stage build with Rust 1.82
+├── docker-compose.yml   # Service configuration
+├── Makefile            # Docker management commands
+└── .dockerignore       # Build context optimization
+```
+
 - `main.rs`: Bootstrapping, tokio runtime, HTTP server
 - `bot.rs`: All Telegram interaction (500+ lines, split if larger)
 - `game.rs`: Pure game logic with comprehensive tests
 - `state.rs`: Type definitions, enums, structs
+- `Dockerfile`: Multi-stage build (Rust 1.82, debian:bookworm-slim runtime)
+- `docker-compose.yml`: Service configuration with health checks and restart policy
+- `Makefile`: Convenient commands for Docker operations
+- `.dockerignore`: Excludes unnecessary files from build context
 
 ## Internationalization
 
@@ -301,6 +330,7 @@ Before pushing, run:
 cargo fmt --all
 cargo clippy --all-targets --all-features -- -D warnings
 cargo test --all-features --workspace
+make build                                # Ensure Docker build passes (recommended)
 ```
 
 ## Git Commit Guidelines
@@ -328,6 +358,7 @@ Always run these commands before making changes:
 cargo test --all-features --workspace    # Ensure baseline tests pass
 cargo clippy --all-targets --all-features -- -D warnings
 cargo fmt -- --check
+make build                                # Ensure Docker build passes (optional but recommended)
 ```
 
 After making changes:
@@ -383,6 +414,27 @@ Monitor what messages the bot receives:
 - Verify dice animation timing
 - Check keyboard buttons work correctly
 
+### Docker Debugging
+```bash
+# Check container logs
+make logs
+
+# Check container status
+make status
+
+# Run container directly with debug logging
+docker run --rm -e RUST_LOG=debug dice-bot
+
+# Check Docker logs for errors
+docker logs telegram-dice-bot --tail 50
+
+# Enter container shell (for debugging)
+docker exec -it telegram-dice-bot /bin/sh
+
+# Test health check endpoint
+curl http://localhost:5000/health
+```
+
 ## Performance Considerations
 
 - Avoid blocking operations in async handlers
@@ -406,3 +458,39 @@ Monitor what messages the bot receives:
 - **Language**: Rust 2021 edition
 - **Framework**: teloxide 0.12
 - **Maintainer**: Alxy Dev
+
+## Docker Deployment Best Practices
+
+### Image Optimization
+- Use multi-stage builds to minimize runtime image size (~75MB)
+- Always include `Cargo.lock` for reproducible builds
+- Use `--locked` flag with `cargo install` to prevent dependency updates
+- Clean up build artifacts after compilation
+
+### Container Security
+- Run as non-root user (`appuser` with UID 10001)
+- Never commit `.env` files with real tokens
+- Use environment variables for sensitive data (BOT_TOKEN)
+- Set restart policy to `unless-stopped` for production
+
+### Health Checks
+- Health endpoint: `GET /health` on port 5000
+- Returns HTML with status: `<h1>Telegram Dice Bot is running</h1>`
+- Use for monitoring and autoscale deployment
+
+### Logging in Docker
+- Use `RUST_LOG` environment variable to control log level
+- Logs are sent to stdout/stderr (Docker can capture them)
+- View logs with: `make logs` or `docker logs telegram-dice-bot`
+- Recommended levels: `info` (production), `debug` (troubleshooting)
+
+### Resource Cleanup
+- Run `make prune` to clean unused Docker resources
+- Use `make clean` to remove containers and images
+- Periodically run `docker system prune -a -f --volumes` for aggressive cleanup
+
+### Troubleshooting
+1. **Container exits immediately**: Check BOT_TOKEN is valid
+2. **No logs visible**: Set `RUST_LOG=debug` or `RUST_LOG_FORMAT=always`
+3. **Port already in use**: Change `PORT` in docker-compose.yml
+4. **Image too large**: Rebuild with `--no-cache` flag
