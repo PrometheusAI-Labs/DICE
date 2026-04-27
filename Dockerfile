@@ -27,6 +27,6 @@ WORKDIR /app
 COPY --from=builder /usr/local/bin/${APP_NAME} /usr/local/bin/${APP_NAME}
 
 EXPOSE 5000
-USER appuser
+USER root
 
-CMD ["/usr/local/bin/telegram-dice-bot"]
+CMD ["/bin/sh", "-c", "echo 'Starting bot...' && /usr/local/bin/telegram-dice-bot"]
